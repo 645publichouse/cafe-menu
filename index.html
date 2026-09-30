@@ -2,19 +2,96 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#f3efe4">
   <title>6:45 Public House Menü</title>
 
-  <!-- Fallback redirect if JavaScript is disabled -->
-  <meta http-equiv="refresh" content="0; url=menu.pdf">
+  <style>
+    * { box-sizing: border-box; }
 
-  <script>
-    // Open the PDF directly and add a cache-busting value
-    // so customers see the latest uploaded menu.
-    window.location.replace("menu.pdf?v=" + Date.now());
-  </script>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #f3efe4;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+    }
+
+    #menu {
+      display: block;
+      width: 100%;
+      max-width: 1800px;
+      height: auto;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+    #loading, #error {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #f3efe4;
+      text-align: center;
+      padding: 24px;
+    }
+
+    #error { display: none; }
+  </style>
 </head>
+
 <body>
-  <p>Menü açılıyor...</p>
+  <div id="loading">Menü yükleniyor...</div>
+  <div id="error">Menü şu anda görüntülenemiyor. Lütfen sayfayı yenileyin.</div>
+  <canvas id="menu"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+
+    async function renderMenu() {
+      try {
+        const pdfUrl = "menu.pdf?v=" + Date.now();
+        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        const page = await pdf.getPage(1);
+
+        const canvas = document.getElementById("menu");
+        const ctx = canvas.getContext("2d", { alpha: false });
+
+        // Render at high resolution, then let CSS fit it to the screen.
+        const baseViewport = page.getViewport({ scale: 1 });
+        const desiredWidth = Math.min(
+          Math.max(window.innerWidth * (window.devicePixelRatio || 1), 1600),
+          3000
+        );
+        const scale = desiredWidth / baseViewport.width;
+        const viewport = page.getViewport({ scale });
+
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+
+        await page.render({
+          canvasContext: ctx,
+          viewport: viewport
+        }).promise;
+
+        document.getElementById("loading").style.display = "none";
+      } catch (err) {
+        console.error(err);
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "flex";
+      }
+    }
+
+    renderMenu();
+  </script>
 </body>
 </html>
