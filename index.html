@@ -1,92 +1,20 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>6:45 Public House Menü</title>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #f4f4f4;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .topbar {
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e5e5;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .viewer {
-      width: 100%;
-      height: calc(100% - 52px);
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: #ffffff;
-    }
-
-    .fallback {
-      display: none;
-      padding: 24px;
-      text-align: center;
-    }
-
-    .fallback a {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 12px 18px;
-      border-radius: 8px;
-      background: #111;
-      color: #fff;
-      text-decoration: none;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="topbar">6:45 Public House Menü</div>
-
-  <div class="viewer">
-    <iframe id="menuFrame" title="Cafe Menu"></iframe>
-
-    <div class="fallback" id="fallback">
-      Menü görüntülenemedi.
-      <br />
-      <a id="openPdf" href="menu.pdf" target="_blank" rel="noopener">
-        Menüyü Aç
-      </a>
-    </div>
-  </div>
+  <!-- Fallback redirect if JavaScript is disabled -->
+  <meta http-equiv="refresh" content="0; url=menu.pdf">
 
   <script>
-    const version = Date.now();
-    const pdfUrl = `menu.pdf?v=${version}`;
-
-    const iframe = document.getElementById("menuFrame");
-    const fallback = document.getElementById("fallback");
-    const openPdf = document.getElementById("openPdf");
-
-    iframe.src = pdfUrl;
-    openPdf.href = pdfUrl;
-
-    iframe.addEventListener("error", () => {
-      iframe.style.display = "none";
-      fallback.style.display = "block";
-    });
+    // Open the PDF directly and add a cache-busting value
+    // so customers see the latest uploaded menu.
+    window.location.replace("menu.pdf?v=" + Date.now());
   </script>
+</head>
+<body>
+  <p>Menü açılıyor...</p>
 </body>
 </html>
